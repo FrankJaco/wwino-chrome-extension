@@ -1,168 +1,179 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>WWino Helper</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            width: 320px;
-            padding: 16px;
-            margin: 0;
-            background-color: #f8f5ed;
-            color: #333;
-            overflow: hidden;
-        }
-        .header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            margin-bottom: 16px;
-        }
-        h1 {
-            font-size: 1.25rem;
-            color: #4a0e4e;
-            margin: 0;
-            text-align: center;
-        }
-        #settingsButton {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.5rem;
-            padding: 0;
-            line-height: 1;
-        }
-        form div, .view-section {
-            margin-bottom: 12px;
-        }
-        label {
-            display: block;
-            margin-bottom: 4px;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-        input[type="url"],
-        input[type="number"],
-        input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 1rem;
-            text-align: center;
-        }
-        input:focus {
-            outline: none;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
-        }
-        input[readonly] {
-            background-color: #f3f4f6;
-            cursor: default;
-            font-size: 0.8rem;
-            color: #6b7280;
-        }
-        .cost-tier-selector { display: flex; gap: 8px; }
-        .cost-tier-selector span {
-            cursor: pointer; padding: 6px 10px; border-radius: 6px; border: 1px solid #e5e7eb;
-            background-color: white; transition: all 0.2s ease; flex-grow: 1; text-align: center;
-        }
-        .cost-tier-selector span.selected { background-color: #8b5cf6; color: white; border-color: #8b5cf6; }
-        .input-group { display: flex; align-items: center; }
-        .stepper-btn {
-            height: 38px; width: 38px; border: 1px solid #e5e7eb; background-color: white;
-            font-size: 1.5rem; cursor: pointer; line-height: 38px; flex-shrink: 0;
-        }
-        .stepper-btn:first-child { border-top-left-radius: 6px; border-bottom-left-radius: 6px; border-right: none; }
-        .stepper-btn:last-child { border-top-right-radius: 6px; border-bottom-right-radius: 6px; border-left: none; }
-        #vintage, #quantity { border-radius: 0; }
-        button {
-            width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 1rem;
-            font-weight: 600; cursor: pointer; transition: background-color 0.2s ease;
-        }
-        button:disabled { opacity: 0.7; cursor: not-allowed; }
-        .button-group { display: flex; gap: 8px; margin-top: 16px; }
-        #submitButton, #saveSettingsButton { background-color: #8b5cf6; color: white; }
-        #submitButton:hover:not(:disabled), #saveSettingsButton:hover { background-color: #7c3aed; }
-        #cancelButton { background-color: #e5e7eb; color: #333; }
-        #cancelButton:hover { background-color: #d1d5db; }
-        #status { margin-top: 12px; text-align: center; font-weight: 500; min-height: 20px; }
-        .error { color: #dc2626; }
-        .success { color: #16a34a; }
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- View Elements ---
+    const mainView = document.getElementById('mainView');
+    const settingsView = document.getElementById('settingsView');
 
-    <!-- Main View -->
-    <div id="mainView">
-        <div class="header">
-            <h1>Wonderful Wino</h1>
-            <button id="settingsButton" title="Settings">⚙️</button>
-        </div>
-        <form id="addWineForm">
-             <div class="view-section">
-                <label for="vivinoUrlDisplay">Vivino URL</label>
-                <input type="text" id="vivinoUrlDisplay" readonly>
-            </div>
-            <div class="view-section">
-                <label for="vintage">Vintage</label>
-                <div class="input-group">
-                    <button type="button" id="vintageDecrement" class="stepper-btn">-</button>
-                    <input type="number" id="vintage" placeholder="e.g., 2022" min="1900">
-                    <button type="button" id="vintageIncrement" class="stepper-btn">+</button>
-                </div>
-            </div>
-            <div class="view-section">
-                <label for="quantity">Quantity</label>
-                <div class="input-group">
-                    <button type="button" id="quantityDecrement" class="stepper-btn">-</button>
-                    <input type="number" id="quantity" value="1" min="1" required>
-                    <button type="button" id="quantityIncrement" class="stepper-btn">+</button>
-                </div>
-            </div>
-            <div class="view-section">
-                <label>Cost Tier (Optional)</label>
-                <div id="costTierSelector" class="cost-tier-selector">
-                    <span data-value="1">$</span>
-                    <span data-value="2">$$</span>
-                    <span data-value="3">$$$</span>
-                    <span data-value="4">$$$$</span>
-                    <span data-value="5">$$$$$</span>
-                </div>
-            </div>
-            <div class="button-group">
-                <button type="button" id="cancelButton">Cancel</button>
-                <button type="submit" id="submitButton">Add Wine</button>
-            </div>
-        </form>
-        <div id="status"></div>
-    </div>
+    // --- Main View Form Elements ---
+    const addWineForm = document.getElementById('addWineForm');
+    const vivinoUrlDisplay = document.getElementById('vivinoUrlDisplay');
+    const vintageInput = document.getElementById('vintage');
+    const quantityInput = document.getElementById('quantity');
+    const costTierSelector = document.getElementById('costTierSelector');
+    const statusDiv = document.getElementById('status');
+    const submitButton = document.getElementById('submitButton');
+    const cancelButton = document.getElementById('cancelButton');
+    const settingsButton = document.getElementById('settingsButton');
+    const vintageDecrementBtn = document.getElementById('vintageDecrement');
+    const vintageIncrementBtn = document.getElementById('vintageIncrement');
+    const quantityDecrementBtn = document.getElementById('quantityDecrement');
+    const quantityIncrementBtn = document.getElementById('quantityIncrement');
+    
+    // --- Settings View Form Elements ---
+    const settingsForm = document.getElementById('settingsForm');
+    const backendUrlInput = document.getElementById('backendUrl');
+    const backButton = document.getElementById('backButton');
 
-    <!-- Settings View -->
-    <div id="settingsView" class="hidden">
-        <div class="header">
-             <h1>Settings</h1>
-        </div>
-        <form id="settingsForm">
-            <div class="view-section">
-                <label for="backendUrl">Backend URL</label>
-                <input type="url" id="backendUrl" placeholder="e.g., http://192.168.1.100:5000" required>
-            </div>
-             <div class="button-group">
-                <button type="submit" id="saveSettingsButton">Save & Close</button>
-            </div>
-        </form>
-    </div>
+    let selectedCostTier = null;
+    let originalVivinoUrl = '';
 
-    <script src="popup.js"></script>
-</body>
-</html>
+    // --- Initialization ---
+    async function initialize() {
+        try {
+            const result = await chrome.storage.local.get(['backendUrl']);
+            if (result.backendUrl) {
+                backendUrlInput.value = result.backendUrl;
+                showMainView();
+                
+                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                if (tabs.length > 0 && tabs[0].url && tabs[0].url.startsWith('http')) {
+                    originalVivinoUrl = tabs[0].url;
+                    const url = new URL(originalVivinoUrl);
+                    const yearParam = url.searchParams.get('year');
+
+                    vintageInput.value = (yearParam && /^\d{4}$/.test(yearParam)) 
+                        ? yearParam 
+                        : new Date().getFullYear() - 3;
+                    
+                    updateVivinoUrlDisplay();
+                } else {
+                    showStatus('Not a valid page.', 'error');
+                    submitButton.disabled = true;
+                }
+            } else {
+                showSettingsView();
+            }
+        } catch (e) {
+            console.error("Initialization failed:", e);
+            showStatus('Error loading extension.', 'error');
+        }
+    }
+    
+    // --- View Management ---
+    function showMainView() {
+        mainView.classList.remove('hidden');
+        settingsView.classList.add('hidden');
+    }
+
+    function showSettingsView() {
+        settingsView.classList.remove('hidden');
+        mainView.classList.add('hidden');
+    }
+
+    // --- Dynamic URL Display ---
+    function updateVivinoUrlDisplay() {
+        if (!originalVivinoUrl) return;
+        try {
+            const url = new URL(originalVivinoUrl);
+            url.searchParams.set('year', vintageInput.value);
+            vivinoUrlDisplay.value = url.toString();
+        } catch (e) {
+            console.error("Could not update URL", e);
+        }
+    }
+
+    // --- Event Listeners ---
+    settingsButton.addEventListener('click', showSettingsView);
+    backButton.addEventListener('click', showMainView);
+
+    settingsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const url = backendUrlInput.value.trim();
+        if (url) {
+            chrome.storage.local.set({ backendUrl: url }, () => {
+                initialize();
+            });
+        }
+    });
+
+    vintageInput.addEventListener('input', updateVivinoUrlDisplay);
+    vintageDecrementBtn.addEventListener('click', () => { vintageInput.stepDown(); updateVivinoUrlDisplay(); });
+    vintageIncrementBtn.addEventListener('click', () => { vintageInput.stepUp(); updateVivinoUrlDisplay(); });
+    quantityDecrementBtn.addEventListener('click', () => { quantityInput.stepDown(); });
+    quantityIncrementBtn.addEventListener('click', () => { quantityInput.stepUp(); });
+    cancelButton.addEventListener('click', () => { window.close(); });
+
+    costTierSelector.addEventListener('click', (e) => {
+        if (e.target.tagName === 'SPAN') {
+            const value = e.target.dataset.value;
+            const currentSelected = costTierSelector.querySelector('.selected');
+            if (currentSelected) {
+                currentSelected.classList.remove('selected');
+            }
+            if (selectedCostTier?.toString() !== value) {
+                e.target.classList.add('selected');
+                selectedCostTier = parseInt(value, 10);
+            } else {
+                selectedCostTier = null;
+            }
+        }
+    });
+
+    addWineForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const { backendUrl } = await chrome.storage.local.get(['backendUrl']);
+        if (!backendUrl) {
+            showStatus('Backend URL not set. Go to settings.', 'error');
+            return;
+        }
+
+        const vivinoUrl = vivinoUrlDisplay.value;
+        if (!vivinoUrl.includes('vivino.com')) {
+            showStatus('This is not a Vivino page.', 'error');
+            return;
+        }
+
+        const payload = {
+            vivino_url: vivinoUrl,
+            quantity: parseInt(quantityInput.value, 10),
+            cost_tier: selectedCostTier,
+        };
+
+        showStatus('Adding wine...', 'info', true);
+
+        try {
+            const response = await fetch(`${backendUrl}/scan-wine`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            showStatus(`${result.wine_name} added!`, 'success');
+            setTimeout(() => window.close(), 1500);
+
+        } catch (error) {
+            showStatus(`Error: ${error.message}`, 'error');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Add Wine';
+        }
+    });
+
+    function showStatus(message, type = 'info', loading = false) {
+        statusDiv.textContent = message;
+        statusDiv.className = type;
+        submitButton.disabled = loading;
+        cancelButton.disabled = loading;
+        if (loading) submitButton.textContent = 'Working...';
+    }
+
+    // --- Run Initialization ---
+    initialize();
+});
 

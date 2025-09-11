@@ -28,19 +28,28 @@
             color: #4a0e4e;
             margin: 0;
             text-align: center;
+            flex-grow: 1;
         }
 
-        #settingsButton {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
+        #settingsButton,
+        #backButton {
             background: none;
             border: none;
             cursor: pointer;
             font-size: 1.5rem;
             padding: 0;
             line-height: 1;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .header-spacer {
+            width: 24px;
+            flex-shrink: 0;
         }
 
         form div,
@@ -203,6 +212,7 @@
     <!-- Main View -->
     <div id="mainView">
         <div class="header">
+            <span class="header-spacer"></span>
             <h1>Wonderful Wino</h1>
             <button id="settingsButton" title="Settings">⚙️</button>
         </div>
@@ -248,7 +258,9 @@
     <!-- Settings View -->
     <div id="settingsView" class="hidden">
         <div class="header">
+            <button id="backButton" title="Back">←</button>
             <h1>Settings</h1>
+            <span class="header-spacer"></span>
         </div>
         <form id="settingsForm">
             <div class="view-section">
