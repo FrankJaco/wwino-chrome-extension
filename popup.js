@@ -20,7 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- Settings View Form Elements ---
     const settingsForm = document.getElementById('settingsForm');
-    const backendUrlInput = document.getElementById('backendUrl');
+    const backendHostInput = document.getElementById('backendHost');
+    const backendPortInput = document.getElementById('backendPort');
     const backButton = document.getElementById('backButton');
 
     let selectedCostTier = null;
@@ -31,7 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const result = await chrome.storage.local.get(['backendUrl']);
             if (result.backendUrl) {
-                backendUrlInput.value = result.backendUrl;
+                try {
+                    const url = new URL(result.backendUrl);
+                    backendHostInput.value = url.hostname;
+                    backendPortInput.value = url.port;
+                } catch (e) {
+                    console.error("Could not parse saved backend URL:", result.backendUrl);
+                }
                 showMainView();
                 
                 const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -87,9 +94,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     settingsForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const url = backendUrlInput.value.trim();
-        if (url) {
-            chrome.storage.local.set({ backendUrl: url }, () => {
+        const host = backendHostInput.value.trim();
+        const port = backendPortInput.value.trim() || '5000';
+        
+        if (host) {
+            const cleanHost = host.replace(/^https?:\/\//, '');
+            const backendUrl = `http://${cleanHost}:${port}`;
+            chrome.storage.local.set({ backendUrl: backendUrl }, () => {
                 initialize();
             });
         }
@@ -167,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showStatus(message, type = 'info', loading = false) {
         statusDiv.textContent = message;
-        statusDiv.className = type;
+        statusDiv.className = `status-${type}`; // Use classes for styling
         submitButton.disabled = loading;
         cancelButton.disabled = loading;
         if (loading) submitButton.textContent = 'Working...';
