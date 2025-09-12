@@ -187,4 +187,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Run Initialization ---
     initialize();
 });
-
