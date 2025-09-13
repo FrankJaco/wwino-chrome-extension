@@ -1,9 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "WWino Helper",
+  "name": "Wonderful Wino Helper",
   "version": "1.0",
   "description": "Easily add wines from a Vivino page to your Wonderful-Wino inventory.",
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["storage", "tabs"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
