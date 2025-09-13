@@ -119,17 +119,24 @@
         .stepper-btn {
             height: 38px;
             width: 38px;
-            border: none;
-            background-color: #8b5cf6;
-            color: white;
+            border: 1px solid #e5e7eb;
+            background-color: white;
             font-size: 1.5rem;
             cursor: pointer;
-            line-height: 1;
+            line-height: 38px;
             flex-shrink: 0;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        }
+
+        .stepper-btn:first-child {
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+            border-right: none;
+        }
+
+        .stepper-btn:last-child {
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+            border-left: none;
         }
 
         #vintage,
@@ -201,10 +208,11 @@
         .settings-group {
             display: flex;
             gap: 8px;
-            align-items: flex-end;
+            align-items: center;
+            /* This ensures the inputs themselves are aligned */
         }
 
-        .host-input {
+        .form-field {
             flex-grow: 1;
         }
 
@@ -217,7 +225,6 @@
 
 <body>
 
-    <!-- Main View -->
     <div id="mainView">
         <div class="header">
             <span class="header-spacer"></span>
@@ -263,7 +270,6 @@
         <div id="status"></div>
     </div>
 
-    <!-- Settings View -->
     <div id="settingsView" class="hidden">
         <div class="header">
             <button id="backButton" title="Back">←</button>
@@ -273,13 +279,15 @@
         <form id="settingsForm">
             <div class="view-section">
                 <div class="settings-group">
-                    <div class="host-input">
+                    <div class="form-field host-input">
                         <label for="backendHost">Backend Host/IP</label>
-                        <input type="text" id="backendHost" placeholder="e.g., 192.168.1.100" required>
+                        <input type="text" id="backendHost" placeholder="e.g., 192.168.1.100" required
+                            title="Usually the same as your Home Assistant server's IP address.">
                     </div>
-                    <div class="port-input">
+                    <div class="form-field port-input">
                         <label for="backendPort">Port</label>
-                        <input type="number" id="backendPort" value="5000" placeholder="5000" required>
+                        <input type="number" id="backendPort" value="5000" placeholder="5000" required
+                            title="Do not change from 5000 unless you've changed the default port in your add-on configuration.">
                     </div>
                 </div>
             </div>
