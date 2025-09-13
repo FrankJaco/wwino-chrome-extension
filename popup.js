@@ -29,47 +29,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initialization ---
     async function initialize() {
-        try {
-            const result = await chrome.storage.local.get(['backendUrl']);
-            if (result.backendUrl) {
-                try {
-                    const url = new URL(result.backendUrl);
-                    backendHostInput.value = url.hostname;
-                    backendPortInput.value = url.port;
-                } catch (e) {
-                    console.error("Could not parse saved backend URL:", result.backendUrl);
-                }
-                
-                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-                const currentUrl = tabs.length > 0 ? tabs[0].url : null;
-                
-                if (currentUrl && currentUrl.includes('vivino.com')) {
-                    showMainView();
-                    originalVivinoUrl = currentUrl;
-                    const url = new URL(originalVivinoUrl);
-                    const yearParam = url.searchParams.get('year');
-
-                    vintageInput.value = (yearParam && /^\d{4}$/.test(yearParam)) 
-                        ? yearParam 
-                        : new Date().getFullYear() - 3;
-                    
-                    updateVivinoUrlDisplay();
-                    submitButton.disabled = false;
-                    vivinoUrlDisplay.value = originalVivinoUrl;
-                } else {
-                    showMainView();
-                    showStatus('Not a Vivino page.', 'error');
-                    submitButton.disabled = true;
-                    addWineForm.classList.add('hidden'); // Hide the form fields
-                }
-            } else {
-                showSettingsView();
+    try {
+        const result = await chrome.storage.local.get(['backendUrl']);
+        if (result.backendUrl) {
+            try {
+                const url = new URL(result.backendUrl);
+                backendHostInput.value = url.hostname;
+                backendPortInput.value = url.port;
+            } catch (e) {
+                console.error("Could not parse saved backend URL:", result.backendUrl);
             }
-        } catch (e) {
-            console.error("Initialization failed:", e);
-            showStatus('Error loading extension.', 'error');
+
+            const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+            const currentUrl = tabs.length > 0 ? tabs[0].url : null;
+
+            // Use a more robust check with a regular expression for /w/ followed by a number
+            const isSpecificVivinoWinePage = currentUrl && currentUrl.includes('vivino.com') && /\/w\/\d+/.test(currentUrl);
+
+            if (isSpecificVivinoWinePage) {
+                showMainView();
+                originalVivinoUrl = currentUrl;
+                const url = new URL(originalVivinoUrl);
+                const yearParam = url.searchParams.get('year');
+
+                vintageInput.value = (yearParam && /^\d{4}$/.test(yearParam))
+                    ? yearParam
+                    : new Date().getFullYear() - 3;
+
+                updateVivinoUrlDisplay();
+                submitButton.disabled = false;
+                addWineForm.classList.remove('hidden'); // Ensure form is visible
+                vivinoUrlDisplay.value = originalVivinoUrl;
+            } else if (currentUrl && currentUrl.includes('vivino.com')) {
+                // It's a general Vivino page, not a specific wine page
+                showMainView();
+                showStatus('Please navigate to a specific wine\'s page to add it.', 'info');
+                submitButton.disabled = true;
+                addWineForm.classList.add('hidden'); // Hide the form fields
+            } else {
+                // Not a Vivino page at all
+                showMainView();
+                showStatus('Not a Vivino page.', 'error');
+                submitButton.disabled = true;
+                addWineForm.classList.add('hidden'); // Hide the form fields
+            }
+
+        } else {
+            showSettingsView();
         }
+    } catch (e) {
+        console.error("Initialization failed:", e);
+        showStatus('Error loading extension.', 'error');
     }
+}
 
     // --- View Management ---
     function showMainView() {

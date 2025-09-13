@@ -114,34 +114,38 @@
         .input-group {
             display: flex;
             align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .stepper-btn {
             height: 38px;
             width: 38px;
-            border: 1px solid #e5e7eb;
-            background-color: white;
+            border: none;
+            background-color: #8b5cf6;
+            color: white;
             font-size: 1.5rem;
+            line-height: 1;
             cursor: pointer;
-            line-height: 38px;
-            flex-shrink: 0;
+            border-radius: 50%;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .stepper-btn:first-child {
-            border-top-left-radius: 6px;
-            border-bottom-left-radius: 6px;
-            border-right: none;
+        .stepper-btn:hover {
+            background-color: #7c3aed;
         }
 
-        .stepper-btn:last-child {
-            border-top-right-radius: 6px;
-            border-bottom-right-radius: 6px;
-            border-left: none;
+        .stepper-btn:active {
+            transform: scale(0.95);
         }
 
         #vintage,
         #quantity {
-            border-radius: 0;
+            flex-grow: 1;
         }
 
         button {
@@ -193,12 +197,16 @@
             min-height: 20px;
         }
 
-        .error {
+        .status-error {
             color: #dc2626;
         }
 
-        .success {
+        .status-success {
             color: #16a34a;
+        }
+
+        .status-info {
+            color: #2563eb;
         }
 
         .hidden {
@@ -209,7 +217,6 @@
             display: flex;
             gap: 8px;
             align-items: center;
-            /* This ensures the inputs themselves are aligned */
         }
 
         .form-field {
@@ -239,17 +246,17 @@
             <div class="view-section">
                 <label for="vintage">Vintage</label>
                 <div class="input-group">
-                    <button type="button" id="vintageDecrement" class="stepper-btn">-</button>
+                    <button type="button" id="vintageDecrement" class="stepper-btn">−</button>
                     <input type="number" id="vintage" placeholder="e.g., 2022" min="1900">
-                    <button type="button" id="vintageIncrement" class="stepper-btn">+</button>
+                    <button type="button" id="vintageIncrement" class="stepper-btn">＋</button>
                 </div>
             </div>
             <div class="view-section">
                 <label for="quantity">Quantity</label>
                 <div class="input-group">
-                    <button type="button" id="quantityDecrement" class="stepper-btn">-</button>
+                    <button type="button" id="quantityDecrement" class="stepper-btn">−</button>
                     <input type="number" id="quantity" value="1" min="1" required>
-                    <button type="button" id="quantityIncrement" class="stepper-btn">+</button>
+                    <button type="button" id="quantityIncrement" class="stepper-btn">＋</button>
                 </div>
             </div>
             <div class="view-section">
