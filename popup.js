@@ -39,11 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch (e) {
                     console.error("Could not parse saved backend URL:", result.backendUrl);
                 }
-                showMainView();
                 
                 const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-                if (tabs.length > 0 && tabs[0].url && tabs[0].url.startsWith('http')) {
-                    originalVivinoUrl = tabs[0].url;
+                const currentUrl = tabs.length > 0 ? tabs[0].url : null;
+                
+                if (currentUrl && currentUrl.includes('vivino.com')) {
+                    showMainView();
+                    originalVivinoUrl = currentUrl;
                     const url = new URL(originalVivinoUrl);
                     const yearParam = url.searchParams.get('year');
 
@@ -52,9 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         : new Date().getFullYear() - 3;
                     
                     updateVivinoUrlDisplay();
+                    submitButton.disabled = false;
+                    vivinoUrlDisplay.value = originalVivinoUrl;
                 } else {
-                    showStatus('Not a valid page.', 'error');
+                    showMainView();
+                    showStatus('Not a Vivino page.', 'error');
                     submitButton.disabled = true;
+                    addWineForm.classList.add('hidden'); // Hide the form fields
                 }
             } else {
                 showSettingsView();
@@ -64,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showStatus('Error loading extension.', 'error');
         }
     }
-    
+
     // --- View Management ---
     function showMainView() {
         mainView.classList.remove('hidden');
