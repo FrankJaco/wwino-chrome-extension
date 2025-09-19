@@ -29,59 +29,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initialization ---
     async function initialize() {
-    try {
-        const result = await chrome.storage.local.get(['backendUrl']);
-        if (result.backendUrl) {
-            try {
-                const url = new URL(result.backendUrl);
-                backendHostInput.value = url.hostname;
-                backendPortInput.value = url.port;
-            } catch (e) {
-                console.error("Could not parse saved backend URL:", result.backendUrl);
-            }
+        try {
+            const result = await chrome.storage.local.get(['backendUrl']);
+            if (result.backendUrl) {
+                try {
+                    const url = new URL(result.backendUrl);
+                    backendHostInput.value = url.hostname;
+                    backendPortInput.value = url.port;
+                } catch (e) {
+                    console.error("Could not parse saved backend URL:", result.backendUrl);
+                }
 
-            const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-            const currentUrl = tabs.length > 0 ? tabs[0].url : null;
+                const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+                const currentUrl = tabs.length > 0 ? tabs[0].url : null;
 
-            // Use a more robust check with a regular expression for /w/ followed by a number
-            const isSpecificVivinoWinePage = currentUrl && currentUrl.includes('vivino.com') && /\/w\/\d+/.test(currentUrl);
+                const isSpecificVivinoWinePage = currentUrl && currentUrl.includes('vivino.com') && /\/w\/\d+/.test(currentUrl);
 
-            if (isSpecificVivinoWinePage) {
-                showMainView();
-                originalVivinoUrl = currentUrl;
-                const url = new URL(originalVivinoUrl);
-                const yearParam = url.searchParams.get('year');
+                if (isSpecificVivinoWinePage) {
+                    showMainView();
+                    
+                    // --- MODIFIED SECTION ---
+                    // This new logic cleans the URL, removing extra parameters like 'price_id'.
+                    const url = new URL(currentUrl);
+                    const yearParam = url.searchParams.get('year');
 
-                vintageInput.value = (yearParam && /^\d{4}$/.test(yearParam))
-                    ? yearParam
-                    : new Date().getFullYear() - 3;
+                    // 1. Get the base URL without any query parameters.
+                    const cleanBaseUrl = `${url.origin}${url.pathname}`;
 
-                updateVivinoUrlDisplay();
-                submitButton.disabled = false;
-                addWineForm.classList.remove('hidden'); // Ensure form is visible
-                vivinoUrlDisplay.value = originalVivinoUrl;
-            } else if (currentUrl && currentUrl.includes('vivino.com')) {
-                // It's a general Vivino page, not a specific wine page
-                showMainView();
-                showStatus('Please navigate to a specific wine\'s page to add it.', 'info');
-                submitButton.disabled = true;
-                addWineForm.classList.add('hidden'); // Hide the form fields
+                    // 2. Create a new URL object from the clean base.
+                    const cleanUrl = new URL(cleanBaseUrl);
+
+                    // 3. If a valid year parameter existed, add ONLY that parameter back.
+                    if (yearParam && /^\d{4}$/.test(yearParam)) {
+                        cleanUrl.searchParams.set('year', yearParam);
+                    }
+
+                    // 4. Store the fully cleaned URL.
+                    originalVivinoUrl = cleanUrl.toString();
+                    // --- END MODIFIED SECTION ---
+
+
+                    // The rest of the logic now uses the cleaned URL
+                    vintageInput.value = (yearParam && /^\d{4}$/.test(yearParam))
+                        ? yearParam
+                        : new Date().getFullYear() - 3;
+
+                    updateVivinoUrlDisplay();
+                    submitButton.disabled = false;
+                    addWineForm.classList.remove('hidden');
+                    vivinoUrlDisplay.value = originalVivinoUrl;
+                } else if (currentUrl && currentUrl.includes('vivino.com')) {
+                    showMainView();
+                    showStatus('Please navigate to a specific wine\'s page to add it.', 'info');
+                    submitButton.disabled = true;
+                    addWineForm.classList.add('hidden');
+                } else {
+                    showMainView();
+                    showStatus('Not a Vivino page.', 'error');
+                    submitButton.disabled = true;
+                    addWineForm.classList.add('hidden');
+                }
+
             } else {
-                // Not a Vivino page at all
-                showMainView();
-                showStatus('Not a Vivino page.', 'error');
-                submitButton.disabled = true;
-                addWineForm.classList.add('hidden'); // Hide the form fields
+                showSettingsView();
             }
-
-        } else {
-            showSettingsView();
+        } catch (e) {
+            console.error("Initialization failed:", e);
+            showStatus('Error loading extension.', 'error');
         }
-    } catch (e) {
-        console.error("Initialization failed:", e);
-        showStatus('Error loading extension.', 'error');
     }
-}
 
     // --- View Management ---
     function showMainView() {
@@ -98,9 +114,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateVivinoUrlDisplay() {
         if (!originalVivinoUrl) return;
         try {
-            const url = new URL(originalVivinoUrl);
-            url.searchParams.set('year', vintageInput.value);
-            vivinoUrlDisplay.value = url.toString();
+            // Use a temporary URL object to avoid permanently adding the year if it wasn't there originally
+            const displayUrl = new URL(originalVivinoUrl);
+            displayUrl.searchParams.set('year', vintageInput.value);
+            vivinoUrlDisplay.value = displayUrl.toString();
         } catch (e) {
             console.error("Could not update URL", e);
         }
@@ -196,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showStatus(message, type = 'info', loading = false) {
         statusDiv.textContent = message;
-        statusDiv.className = `status-${type}`; // Use classes for styling
+        statusDiv.className = `status-${type}`;
         submitButton.disabled = loading;
         cancelButton.disabled = loading;
         if (loading) submitButton.textContent = 'Working...';
