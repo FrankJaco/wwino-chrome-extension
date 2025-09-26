@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const vintageIncrementBtn = document.getElementById('vintageIncrement');
     const quantityDecrementBtn = document.getElementById('quantityDecrement');
     const quantityIncrementBtn = document.getElementById('quantityIncrement');
-    
+
     // --- Settings View Form Elements ---
     const settingsForm = document.getElementById('settingsForm');
     const backendHostInput = document.getElementById('backendHost');
@@ -47,37 +47,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (isSpecificVivinoWinePage) {
                     showMainView();
-                    
-                    // --- SECTION MODIFIED FOR HEALTH CHECK ---
-
-                    // 1. Show form immediately, but disable the submit button by default.
                     addWineForm.classList.remove('hidden');
-                    submitButton.disabled = true; 
-                    showStatus('', 'info'); // Clear any previous status messages
+                    submitButton.disabled = true;
+                    showStatus('Checking connection...', 'info'); // Provide initial feedback
 
-                    // 2. Asynchronously check backend connectivity.
+                    // Asynchronously check backend connectivity.
                     async function checkBackendConnection() {
                         try {
-                            // Assumes your backend has a simple '/health' endpoint.
                             const response = await fetch(`${backendUrl}/health`, {
                                 method: 'GET',
                                 signal: AbortSignal.timeout(3000) // Timeout after 3 seconds
                             });
                             if (!response.ok) throw new Error('Backend not healthy');
-                            
-                            // On success, enable the button.
+
+                            // On success, enable the button and clear status.
                             submitButton.disabled = false;
+                            showStatus('', 'info');
                         } catch (error) {
                             // On failure, show an error and keep the button disabled.
                             console.error("Backend health check failed:", error);
                             showStatus('Cannot connect to backend. Are you on the same network?', 'error');
                         }
                     }
-                    
-                    // 3. Run the check without blocking the UI.
-                    checkBackendConnection();
 
-                    // --- END MODIFIED SECTION ---
+                    // Run the check without blocking the UI.
+                    checkBackendConnection();
 
                     // The rest of the logic prepares the form's data as before.
                     const url = new URL(currentUrl);
@@ -91,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     originalVivinoUrl = cleanUrl.toString();
-                    
+
                     vintageInput.value = (yearParam && /^\d{4}$/.test(yearParam))
                         ? yearParam
                         : new Date().getFullYear() - 3;
@@ -100,13 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     vivinoUrlDisplay.value = originalVivinoUrl;
 
                 } else if (currentUrl && currentUrl.includes('vivino.com')) {
-                    // This block for the general Vivino site is untouched.
                     showMainView();
                     showStatus('Please navigate to a specific wine\'s page to add it.', 'info');
                     submitButton.disabled = true;
                     addWineForm.classList.add('hidden');
                 } else {
-                    // This block for non-Vivino pages is untouched.
                     showMainView();
                     showStatus('Not a Vivino page.', 'error');
                     submitButton.disabled = true;
@@ -114,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
             } else {
-                // This block for when settings are not configured is untouched.
                 showSettingsView();
             }
         } catch (e) {
@@ -154,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const host = backendHostInput.value.trim();
         const port = backendPortInput.value.trim() || '5000';
-        
+
         if (host) {
             const cleanHost = host.replace(/^https?:\/\//, '');
             const backendUrl = `http://${cleanHost}:${port}`;
@@ -189,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addWineForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const { backendUrl } = await chrome.storage.local.get(['backendUrl']);
         if (!backendUrl) {
             showStatus('Backend URL not set. Go to settings.', 'error');
@@ -228,18 +219,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             showStatus(`Error: ${error.message}`, 'error');
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = 'Add Wine';
+            submitButton.disabled = true; // Keep button disabled on error
         }
     });
 
     function showStatus(message, type = 'info', loading = false) {
         statusDiv.textContent = message;
         statusDiv.className = `status-${type}`;
-        submitButton.disabled = loading;
         cancelButton.disabled = loading;
+
+        // Corrected logic: only disable the button when loading.
+        // It will not be re-enabled here, preventing the bug.
         if (loading) {
+            submitButton.disabled = true;
             submitButton.textContent = 'Working...';
         } else {
             submitButton.textContent = 'Add Wine';
