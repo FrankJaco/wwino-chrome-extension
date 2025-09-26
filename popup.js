@@ -30,14 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initialization ---
     async function initialize() {
         try {
-            const result = await chrome.storage.local.get(['backendUrl']);
-            if (result.backendUrl) {
+            const { backendUrl } = await chrome.storage.local.get(['backendUrl']);
+            if (backendUrl) {
                 try {
-                    const url = new URL(result.backendUrl);
+                    const url = new URL(backendUrl);
                     backendHostInput.value = url.hostname;
                     backendPortInput.value = url.port;
                 } catch (e) {
-                    console.error("Could not parse saved backend URL:", result.backendUrl);
+                    console.error("Could not parse saved backend URL:", backendUrl);
                 }
 
                 const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -48,42 +48,65 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isSpecificVivinoWinePage) {
                     showMainView();
                     
-                    // --- MODIFIED SECTION ---
-                    // This new logic cleans the URL, removing extra parameters like 'price_id'.
+                    // --- SECTION MODIFIED FOR HEALTH CHECK ---
+
+                    // 1. Show form immediately, but disable the submit button by default.
+                    addWineForm.classList.remove('hidden');
+                    submitButton.disabled = true; 
+                    showStatus('', 'info'); // Clear any previous status messages
+
+                    // 2. Asynchronously check backend connectivity.
+                    async function checkBackendConnection() {
+                        try {
+                            // Assumes your backend has a simple '/health' endpoint.
+                            const response = await fetch(`${backendUrl}/health`, {
+                                method: 'GET',
+                                signal: AbortSignal.timeout(3000) // Timeout after 3 seconds
+                            });
+                            if (!response.ok) throw new Error('Backend not healthy');
+                            
+                            // On success, enable the button.
+                            submitButton.disabled = false;
+                        } catch (error) {
+                            // On failure, show an error and keep the button disabled.
+                            console.error("Backend health check failed:", error);
+                            showStatus('Cannot connect to backend. Are you on the same network?', 'error');
+                        }
+                    }
+                    
+                    // 3. Run the check without blocking the UI.
+                    checkBackendConnection();
+
+                    // --- END MODIFIED SECTION ---
+
+                    // The rest of the logic prepares the form's data as before.
                     const url = new URL(currentUrl);
                     const yearParam = url.searchParams.get('year');
 
-                    // 1. Get the base URL without any query parameters.
                     const cleanBaseUrl = `${url.origin}${url.pathname}`;
-
-                    // 2. Create a new URL object from the clean base.
                     const cleanUrl = new URL(cleanBaseUrl);
 
-                    // 3. If a valid year parameter existed, add ONLY that parameter back.
                     if (yearParam && /^\d{4}$/.test(yearParam)) {
                         cleanUrl.searchParams.set('year', yearParam);
                     }
 
-                    // 4. Store the fully cleaned URL.
                     originalVivinoUrl = cleanUrl.toString();
-                    // --- END MODIFIED SECTION ---
-
-
-                    // The rest of the logic now uses the cleaned URL
+                    
                     vintageInput.value = (yearParam && /^\d{4}$/.test(yearParam))
                         ? yearParam
                         : new Date().getFullYear() - 3;
 
                     updateVivinoUrlDisplay();
-                    submitButton.disabled = false;
-                    addWineForm.classList.remove('hidden');
                     vivinoUrlDisplay.value = originalVivinoUrl;
+
                 } else if (currentUrl && currentUrl.includes('vivino.com')) {
+                    // This block for the general Vivino site is untouched.
                     showMainView();
                     showStatus('Please navigate to a specific wine\'s page to add it.', 'info');
                     submitButton.disabled = true;
                     addWineForm.classList.add('hidden');
                 } else {
+                    // This block for non-Vivino pages is untouched.
                     showMainView();
                     showStatus('Not a Vivino page.', 'error');
                     submitButton.disabled = true;
@@ -91,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
             } else {
+                // This block for when settings are not configured is untouched.
                 showSettingsView();
             }
         } catch (e) {
@@ -114,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateVivinoUrlDisplay() {
         if (!originalVivinoUrl) return;
         try {
-            // Use a temporary URL object to avoid permanently adding the year if it wasn't there originally
             const displayUrl = new URL(originalVivinoUrl);
             displayUrl.searchParams.set('year', vintageInput.value);
             vivinoUrlDisplay.value = displayUrl.toString();
@@ -216,7 +239,11 @@ document.addEventListener('DOMContentLoaded', () => {
         statusDiv.className = `status-${type}`;
         submitButton.disabled = loading;
         cancelButton.disabled = loading;
-        if (loading) submitButton.textContent = 'Working...';
+        if (loading) {
+            submitButton.textContent = 'Working...';
+        } else {
+            submitButton.textContent = 'Add Wine';
+        }
     }
 
     // --- Run Initialization ---
