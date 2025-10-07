@@ -1,61 +1,108 @@
-// Function to register the rule for showing the icon only on Vivino.
-function setDeclarativeRules() {
-  
-  // 1. Remove any previously registered rules (important for updates/reloads)
-  chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
-    
-    // 2. Define the rule to match Vivino pages
-    const vivinoRule = {
-      // CONDITIONS: When to show the icon
-      conditions: [
-        new chrome.declarativeContent.PageStateMatcher({
-          pageUrl: {
-            hostSuffix: 'vivino.com', // Matches both vivino.com and www.vivino.com
-            schemes: ['https']
-          }
-        })
-      ],
-      // ACTIONS: What to do when conditions are met
-      actions: [
-        new chrome.declarativeContent.ShowAction() // This makes the icon visible/active
-      ]
-    };
-    
-    // 3. Register the rule
-    chrome.declarativeContent.onPageChanged.addRules([vivinoRule]);
-    console.log("Declarative rule set for vivino.com");
-  });
+// A central function to update the icon's state (color, clickability, tooltip)
+async function updateActionIcon(tabId) {
+    // We need to get the tab to check its URL.
+    // Use a try-catch block in case the tab has been closed while this is running.
+    try {
+        const tab = await chrome.tabs.get(tabId);
+        
+        // The URL might not be available for special pages like chrome://extensions
+        if (!tab || !tab.url) {
+            await disableIcon(tabId, "This page is not supported.");
+            return;
+        }
+
+        const isVivinoPage = tab.url.includes('vivino.com');
+        const { backendUrl } = await chrome.storage.local.get('backendUrl');
+        const isBackendConfigured = !!backendUrl;
+
+        // Condition for the icon to be active:
+        // 1. The user is on a Vivino page.
+        // 2. The backend server address is configured.
+        if (isVivinoPage && isBackendConfigured) {
+            await enableIcon(tabId);
+        } else {
+            // Determine the correct reason for being disabled.
+            let reason = "Wonderful Wino: Only active on vivino.com";
+            if (isVivinoPage && !isBackendConfigured) {
+                reason = "Wonderful Wino: Click to configure your backend server.";
+            }
+            await disableIcon(tabId, reason);
+        }
+    } catch (error) {
+        console.log(`Could not update icon for tab ${tabId}: ${error.message}`);
+    }
 }
 
+// Helper function to ENABLE the icon (full color, clickable)
+async function enableIcon(tabId) {
+    await chrome.action.enable(tabId);
+    await chrome.action.setTitle({
+        tabId: tabId,
+        title: 'Wonderful Wino Helper' // Default tooltip
+    });
+    await chrome.action.setIcon({
+        tabId: tabId,
+        path: {
+            "16": "images/icon16.png",
+            "48": "images/icon48.png",
+            "128": "images/icon128.png"
+        }
+    });
+}
 
-// Event listener: Run the rule registration when the extension is installed or updated.
-chrome.runtime.onInstalled.addListener(() => {
-  // Hide the icon globally by default
-  chrome.action.disable(); 
-  
-  // Set the rule that will enable/show the icon on Vivino pages
-  setDeclarativeRules();
+// Helper function to DISABLE the icon (gray, not clickable)
+async function disableIcon(tabId, title) {
+    await chrome.action.disable(tabId);
+    await chrome.action.setTitle({
+        tabId: tabId,
+        title: title // Informative tooltip
+    });
+    // Set the icon to the grayscale versions you created in Step 1.
+    await chrome.action.setIcon({
+        tabId: tabId,
+        path: {
+            "16": "images/icon16_disabled.png",
+            "48": "images/icon48_disabled.png",
+            "128": "images/icon128_disabled.png"
+        }
+    });
+}
+
+// --- Event Listeners ---
+
+// 1. When a tab is switched to (activated)
+chrome.tabs.onActivated.addListener(activeInfo => {
+    updateActionIcon(activeInfo.tabId);
 });
 
+// 2. When a tab's URL changes
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    // We only need to check if the URL has changed.
+    if (changeInfo.url) {
+        updateActionIcon(tabId);
+    }
+});
 
-/* OPTIONAL: Keep the logic to disable the icon if the backend URL is NOT configured.
-  This adds an extra layer of control: the icon is only SHOWN by the declarative
-  rule, but this listener can still DISABLE it if settings are missing.
-*/
+// 3. When backend settings are saved in the popup
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    // If the backendUrl changes, we need to re-evaluate the currently active tab.
+    if (namespace === 'local' && changes.backendUrl) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs.length > 0) {
+                updateActionIcon(tabs[0].id);
+            }
+        });
+    }
+});
 
-async function checkBackendSetup() {
-  const result = await chrome.storage.local.get(['backendUrl']);
-  const isSetup = !!result.backendUrl;
-  
-  if (!isSetup) {
-    // If settings are missing, disable the icon globally, overriding the declarative rule.
-    // This forces the user to go to settings by clicking the grayed-out icon.
-    chrome.action.disable(); 
-    console.log("Icon disabled because backend is not configured.");
-  }
-}
-
-// Check on startup and whenever local storage settings change (e.g., when saving settings)
-chrome.runtime.onStartup.addListener(checkBackendSetup);
-chrome.storage.onChanged.addListener(checkBackendSetup);
-checkBackendSetup();
+// 4. When the extension is first installed or updated
+chrome.runtime.onInstalled.addListener(() => {
+    // Go through all open tabs and set the initial icon state.
+    chrome.tabs.query({}, (tabs) => {
+        for (const tab of tabs) {
+            if (tab.id) {
+                updateActionIcon(tab.id);
+            }
+        }
+    });
+});
