@@ -1,20 +1,15 @@
 # Wonderful Wino Helper Chrome Browser Extension
 
-The Wonderful Wino Chrome Browser Extension utilizes the Vivino site to provide publicly available wine facts to make short work of returning from your favorite merchant and getting the wine you purchased entered into your Wonderful Wino Home Assistant Addon’s database.
+The Wonderful Wino Chrome Browser Extension utilizes the Vivino site to obtain publicly available wine facts (e,g, proper name, varietals, region, etc.)  to make short work of returning from your favorite merchant and getting the wine you purchased entered into your Wonderful Wino Home Assistant Addon’s Inventory. 
 
 ![CBE1](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe1.png)
   
 
 ## Installing the Wonderful Wino Chrome Browser Extension
 
- 
 Follow these steps to install the Wonderful Wino Extension in your Chrome browser.
 
-  
-
 #### **Step 1: Download & Unzip the Extension Files**
-
-  
 
 1. Go to the main page of the GitHub repository (if not already there).
 
@@ -34,8 +29,6 @@ https://github.com/FrankJaco/wwino-chrome-extension.git
 
 5. After extracting, you will have a folder, likely named `wwino-chrome-extension-main`. Move this folder to a permanent location where you won't delete it (e.g., your Documents folder).
 
-  
-
 #### **Step 2: Install in Google Chrome**
 
 1. Open the Chrome browser and navigate to the extensions page by typing `chrome://extensions` into your address bar and pressing Enter.
@@ -49,10 +42,8 @@ https://github.com/FrankJaco/wwino-chrome-extension.git
 5. The "Wonderful Wino Helper" extension will now appear on the page.
 
 6. Click the puzzle piece icon (🧩) in your toolbar and pin📌the Wonderful Wino Helper to the toolbar.
-  
 
 The extension is now installed!
-  
 
 ## Wonderful Wino Chrome Extension Configuration
 
