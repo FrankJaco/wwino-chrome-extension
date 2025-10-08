@@ -43,4 +43,24 @@ The extension is now installed!
 
 ## Wonderful Wino Chrome Extension Configuration
 
-On first launch the settings window will pop up automatically.
+*Before you can use the extension, you need to provide the IP address of your Home Assistant.*
+
+**On first launch the settings window will pop up automatically.**
+
+![CBE2](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe2.png)
+
+**Enter the IP address of your Home Assistant Instance where the Wonderful Wino Add-on is installed.  Leave Port at 5000.**
+
+**Important:**  You must be on the same LAN as your Home Assistant which is running the Wonderful Wino Add-on **to use** the Wonderful Wino Chrome Browser Extension.
+
+**Note the highlight message at the bottom of the Extension**
+
+![CBE3](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe3.png)
+
+**This error message will occur if you entered an incorrect IP address for your Home Assistant during initial setup.** (The error would also occur when if you are trying to use the Extension off of your Home Assistant/Wonderful Wino Add-on LAN.)
+
+**To Correct the Home Assistant IP address...**
+
+ 1. Click the **Gear**⚙️ in the upper-right corner of the Extension
+ 2. Correct the IP Address
+ 3. **Save & Close**
