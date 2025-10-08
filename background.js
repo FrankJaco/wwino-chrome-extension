@@ -77,9 +77,14 @@ chrome.tabs.onActivated.addListener(activeInfo => {
 
 // 2. When a tab's URL changes
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    // We only need to check if the URL has changed.
-    if (changeInfo.url) {
-        updateActionIcon(tabId);
+    // To make the icon update more reliable, we run our check in two key moments:
+    //  - When the URL changes (for navigating between pages).
+    //  - When the page status is "complete" (for page reloads or complex loads).
+    if (changeInfo.url || changeInfo.status === 'complete') {
+        // Ensure we only run on actual web pages, not internal chrome:// pages
+        if (tab && tab.url && (tab.url.startsWith('http:') || tab.url.startsWith('https://'))) {
+            updateActionIcon(tabId);
+        }
     }
 });
 
