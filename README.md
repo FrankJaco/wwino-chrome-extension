@@ -75,15 +75,17 @@ The extension is now installed!
 
 ## Using the Wonderful Wino Chrome Extension
 
-**Use your Chrome Browser to search the Vivino website for the wine/vintage that you which to add to your Wonderful Wino Inventory.**
+**Use your Chrome Browser to search the Vivino website directly or the Wonderful Wino Addon's GUI for the wine/vintage that you want to add to your Inventory.**
 
 ![CBE4](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe4.png)
 
-### OR use the Wonderful Wino Add-on's GUI
+### OR via the Wonderful Wino Add-on's GUI
 
 ![CBE5](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe5.png)
 
-**Either method will open on a page on the Vivino site displaying the search results. If by chance the search yielded more than one result, ensure you select your wine before proceeding.**
+**Either method will open on a page on the Vivino site displaying the results. If by chance the search yielded more than one result, ensure you select your wine before proceeding.**
+
+
 
 **Click the Wonderful Wino Browser Extension icon** ![CBE6](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe6.png)
 
