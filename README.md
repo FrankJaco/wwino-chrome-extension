@@ -1,6 +1,6 @@
-# Wonderful Wino Helper Chrome Browser Extension
+# Wonderful Wino Chrome Browser Extension
 
-The Wonderful Wino Chrome Browser Extension utilizes the Vivino site to obtain publicly available wine facts (e,g, proper name, varietals, region, etc.)  to make short work of returning from your favorite merchant and getting the wine you purchased entered into your Wonderful Wino Home Assistant Addon’s Inventory. 
+The Wonderful Wino Chrome Browser Extension utilizes the Vivino site to obtain publicly available wine facts (e,g, proper name, varietals, region, etc.)  to make short work of returning from your favorite merchant and getting the wine you just purchased entered into your Wonderful Wino Home Assistant Addon’s Inventory. 
 
 ![CBE1](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe1.png)
   
@@ -58,7 +58,7 @@ The extension is now installed!
 
 **Important:** You must be on the same LAN as your Home Assistant which is running the Wonderful Wino Add-on to use the Wonderful Wino Chrome Browser Extension.
 
-**Note the highlighted error message at the bottom of the Extension**
+***Note the highlighted error message at the bottom of the Extension***
 
 ![CBE3](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe3.png)
 
@@ -79,11 +79,11 @@ The extension is now installed!
 
 ![CBE4](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe4.png)
 
-**OR use the Wonderful Wino Add-on's GUI** 
+### OR use the Wonderful Wino Add-on's GUI
 
 ![CBE5](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe5.png)
 
-***Either method will open on a page on the Vivino site displaying the search results. If by chance the search yielded more than one result, ensure you select your wine before proceeding.***
+**Either method will open on a page on the Vivino site displaying the search results. If by chance the search yielded more than one result, ensure you select your wine before proceeding.**
 
 **Click the Wonderful Wino Browser Extension icon** ![CBE6](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe6.png)
 
