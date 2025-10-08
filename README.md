@@ -7,6 +7,7 @@ The Wonderful Wino Chrome Browser Extension utilizes the Vivino site to obtain p
 
 ## Installing the Wonderful Wino Chrome Browser Extension
 
+
 Follow these steps to install the Wonderful Wino Extension in your Chrome browser.
 
 #### **Step 1: Download & Unzip the Extension Files**
@@ -47,7 +48,7 @@ The extension is now installed!
 
 ## Wonderful Wino Chrome Extension Configuration
 
-*Before you can use the extension, you need to provide the IP address of your Home Assistant.*
+*Before you can use the extension, you will need the IP address of your Home Assistant system in which the Wonderful Wino Add-on is installed.* 
 
 **On first launch the settings window will pop up automatically.**
 
@@ -55,21 +56,45 @@ The extension is now installed!
 
 **Enter the IP address of your Home Assistant Instance where the Wonderful Wino Add-on is installed. Leave Port at 5000.**
 
-**Important:** You must be on the same LAN as your Home Assistant which is running the Wonderful Wino Add-on **to use** the Wonderful Wino Chrome Browser Extension.
+**Important:** You must be on the same LAN as your Home Assistant which is running the Wonderful Wino Add-on to use the Wonderful Wino Chrome Browser Extension.
 
-**Note the highlighted message at the bottom of the Extension**
+**Note the highlighted error message at the bottom of the Extension**
 
 ![CBE3](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe3.png)
 
-**This error message will occur if you entered an incorrect IP address for your Home Assistant during initial setup.** (The error would also occur when if you are trying to use the Extension off of your Home Assistant/Wonderful Wino Add-on LAN.)
+**If you see this error, it is likely for one of these reasons...**
+ - You entered the wrong IP address for your Home Assistant
+ - The Wonderful Wino Add-on is not running
+ - You are not currently on the same LAN as your Home Assistant
 
-**To Correct** (or update) **the Home Assistant IP address...**
+**To correct** (or update) **the Home Assistant IP address...**
 
 1. Click the **Gear**⚙️ in the upper-right corner of the Extension
-
 2. Enter the corrected/updated IP Address
-
 3.  **Save & Close**
 
 ## Using the Wonderful Wino Chrome Extension
 
+**Use your Chrome Browser to search the Vivino website for the wine/vintage that you which to add to your Wonderful Wino Inventory.**
+
+![CBE4](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe4.png)
+
+**OR use the Wonderful Wino Add-on's GUI** 
+
+![CBE5](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe5.png)
+
+***Either method will open on a page on the Vivino site displaying the search results. If by chance the search yielded more than one result, ensure you select your wine before proceeding.***
+
+**Click the Wonderful Wino Browser Extension icon** ![CBE6](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe6.png)
+
+***In the Wonderful Wino Chrome Extension...***
+![CBE7](https://raw.githubusercontent.com/FrankJaco/wwino-chrome-extension/main/resources/cbe7.png)
+
+ 1. Verify (or change) the **Vintage**
+ 2. Verify (or change) the **Quantity**
+ 3. Select the **Cost Tier** if desired
+ 4. Click **Add Wine**
+
+Move onto you next wine, or better yet open a bottle.
+
+Cheers!
