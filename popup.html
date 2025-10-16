@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WWino Helper</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            width: 320px;
+            padding: 16px;
+            margin: 0;
+            background-color: #f8f5ed;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            color: #4a0e4e;
+            margin: 0;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        #settingsButton,
+        #backButton {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0;
+            line-height: 1;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .header-spacer {
+            width: 24px;
+            flex-shrink: 0;
+        }
+
+        form div,
+        .view-section {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        input[type="url"],
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3);
+        }
+
+        input[readonly] {
+            background-color: #f3f4f6;
+            cursor: default;
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .cost-tier-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .cost-tier-selector span {
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background-color: white;
+            transition: all 0.2s ease;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .cost-tier-selector span.selected {
+            background-color: #8b5cf6;
+            color: white;
+            border-color: #8b5cf6;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .stepper-btn {
+            height: 38px;
+            width: 38px;
+            border: none;
+            background-color: #8b5cf6;
+            color: white;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stepper-btn:hover {
+            background-color: #7c3aed;
+        }
+
+        .stepper-btn:active {
+            transform: scale(0.95);
+        }
+
+        #vintage,
+        #quantity {
+            flex-grow: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        #submitButton,
+        #saveSettingsButton {
+            background-color: #8b5cf6;
+            color: white;
+        }
+
+        #submitButton:hover:not(:disabled),
+        #saveSettingsButton:hover {
+            background-color: #7c3aed;
+        }
+
+        #cancelButton {
+            background-color: #e5e7eb;
+            color: #333;
+        }
+
+        #cancelButton:hover {
+            background-color: #d1d5db;
+        }
+
+        #status {
+            margin-top: 12px;
+            text-align: center;
+            font-weight: 500;
+            min-height: 20px;
+        }
+
+        .status-error {
+            color: #dc2626;
+        }
+
+        .status-success {
+            color: #16a34a;
+        }
+
+        .status-info {
+            color: #2563eb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .settings-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .form-field {
+            flex-grow: 1;
+        }
+
+        .port-input {
+            width: 80px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="mainView">
+        <div class="header">
+            <span class="header-spacer"></span>
+            <h1>Wonderful Wino</h1>
+            <button id="settingsButton" title="Settings">⚙️</button>
+        </div>
+        <form id="addWineForm">
+            <div class="view-section">
+                <label for="vivinoUrlDisplay">Vivino URL</label>
+                <input type="text" id="vivinoUrlDisplay" readonly>
+            </div>
+            <div class="view-section">
+                <label for="vintage">Vintage</label>
+                <div class="input-group">
+                    <button type="button" id="vintageDecrement" class="stepper-btn">−</button>
+                    <input type="number" id="vintage" placeholder="e.g., 2022" min="1900">
+                    <button type="button" id="vintageIncrement" class="stepper-btn">＋</button>
+                </div>
+            </div>
+            <div class="view-section">
+                <label for="quantity">Quantity</label>
+                <div class="input-group">
+                    <button type="button" id="quantityDecrement" class="stepper-btn">−</button>
+                    <input type="number" id="quantity" value="1" min="1" required>
+                    <button type="button" id="quantityIncrement" class="stepper-btn">＋</button>
+                </div>
+            </div>
+            <div class="view-section">
+                <label>Cost Tier (Optional)</label>
+                <div id="costTierSelector" class="cost-tier-selector">
+                    <span data-value="1">$</span>
+                    <span data-value="2">$$</span>
+                    <span data-value="3">$$$</span>
+                    <span data-value="4">$$$$</span>
+                    <span data-value="5">$$$$$</span>
+                </div>
+            </div>
+            <div class="button-group">
+                <button type="button" id="cancelButton">Cancel</button>
+                <button type="submit" id="submitButton">Add Wine</button>
+            </div>
+        </form>
+        <div id="status"></div>
+    </div>
+
+    <div id="settingsView" class="hidden">
+        <div class="header">
+            <button id="backButton" title="Back">←</button>
+            <h1>Settings</h1>
+            <span class="header-spacer"></span>
+        </div>
+        <form id="settingsForm">
+            <div class="view-section">
+                <div class="settings-group">
+                    <div class="form-field host-input">
+                        <label for="backendHost">Backend Host/IP</label>
+                        <input type="text" id="backendHost" placeholder="e.g., 192.168.1.100" required
+                            title="Usually the same as your Home Assistant server's IP address.">
+                    </div>
+                    <div class="form-field port-input">
+                        <label for="backendPort">Port</label>
+                        <input type="number" id="backendPort" value="5000" placeholder="5000" required
+                            title="Do not change from 5000 unless you've changed the default port in your add-on configuration.">
+                    </div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button type="submit" id="saveSettingsButton">Save & Close</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>
